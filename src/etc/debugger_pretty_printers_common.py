@@ -45,6 +45,8 @@ TYPE_KIND_SINGLETON_ENUM    = 13
 TYPE_KIND_CSTYLE_ENUM       = 14
 TYPE_KIND_PTR               = 15
 TYPE_KIND_FIXED_SIZE_VEC    = 16
+TYPE_KIND_STD_HASHSET       = 17
+TYPE_KIND_STD_HASHMAP       = 18
 
 ENCODED_ENUM_PREFIX = "RUST$ENCODED$ENUM$"
 ENUM_DISR_FIELD_NAME = "RUST$ENUM$DISR"
@@ -62,6 +64,12 @@ STD_VEC_FIELD_NAMES = [STD_VEC_FIELD_NAME_BUF,
 
 # std::String related constants
 STD_STRING_FIELD_NAMES = ["vec"]
+
+# std::HashSet related constants
+STD_HASHSET_FIELD_NAMES = ["map"]
+
+# std::HashMap related constants
+STD_HASHMAP_FIELD_NAMES = ["hash_builder", "table", "resize_policy"]
 
 
 class Type(object):
@@ -160,6 +168,16 @@ class Type(object):
         if (unqualified_type_name.startswith("String") and
             self.__conforms_to_field_layout(STD_STRING_FIELD_NAMES)):
             return TYPE_KIND_STD_STRING
+
+        # STD HASHSET
+        if (unqualified_type_name.startswith("HashSet<") and
+            self.__conforms_to_field_layout(STD_HASHSET_FIELD_NAMES)):
+            return TYPE_KIND_STD_HASHSET
+
+        # STD HASHMAP
+        if (unqualified_type_name.startswith("HashMap<") and
+            self.__conforms_to_field_layout(STD_HASHMAP_FIELD_NAMES)):
+            return TYPE_KIND_STD_HASHMAP
 
         # ENUM VARIANTS
         if fields[0].name == ENUM_DISR_FIELD_NAME:

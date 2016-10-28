@@ -124,6 +124,12 @@ def rust_pretty_printer_lookup_function(gdb_val):
     if type_kind == rustpp.TYPE_KIND_STD_STRING:
         return RustStdStringPrinter(val)
 
+    if type_kind == rustpp.TYPE_KIND_STD_HASHSET:
+        return RustStdHashSetPrinter(val)
+
+    if type_kind == rustpp.TYPE_KIND_STD_HASHMAP:
+        return RustStdHashMapPrinter(val)
+
     if type_kind == rustpp.TYPE_KIND_TUPLE:
         return RustStructPrinter(val,
                                  omit_first_field = False,
@@ -266,6 +272,38 @@ class RustStdStringPrinter(object):
         (length, data_ptr, cap) = rustpp.extract_length_ptr_and_cap_from_std_vec(vec)
         return '"%s"' % data_ptr.get_wrapped_value().string(encoding="utf-8",
                                                             length=length)
+
+
+class RustStdHashSetPrinter(object):
+    def __init__(self, val):
+        self.__val = val
+
+    @staticmethod
+    def display_hint():
+        return "set"
+
+    def to_string(self):
+        #(length, data_ptr, cap) = rustpp.extract_length_ptr_and_cap_from_std_vec(self.__val)
+        return (self.__val.type.get_unqualified_type_name())
+
+    def children(self):
+        yield ("test", "test")
+
+
+class RustStdHashMapPrinter(object):
+    def __init__(self, val):
+        self.__val = val
+
+    @staticmethod
+    def display_hint():
+        return "map"
+
+    def to_string(self):
+        #(length, data_ptr, cap) = rustpp.extract_length_ptr_and_cap_from_std_vec(self.__val)
+        return (self.__val.type.get_unqualified_type_name())
+
+    def children(self):
+        yield ("test", "test")
 
 
 class RustCStyleVariantPrinter(object):
